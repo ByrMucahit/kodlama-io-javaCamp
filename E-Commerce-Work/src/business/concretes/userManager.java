@@ -1,40 +1,50 @@
 package business.concretes;
 
-import Adapter.GoogleServiceAdapter;
 import business.abstracts.CheckService;
+import business.abstracts.ValidationService;
 import business.abstracts.userService;
+import dataAccess.abstracts.UserDao;
 import entities.concretes.User;
 
 public class userManager implements userService {
-
+	
+	private CheckService checkManager;
+	private UserDao userDao;
+	private ValidationService verifyService;
+	public userManager(CheckService checkManager, UserDao userDao, ValidationService verifyService) {
+		this.checkManager = checkManager;
+		this.userDao = userDao;
+		this.verifyService = verifyService;
+	}
+	
 	@Override
 	public void signUp(User user) {
 		// 1-Check Session
-				CheckService checking = new CheckManager();
+			
 				
 				// 1.1-Name Checking
 				boolean nameVariable;
-				nameVariable = checking.nameCheckService(user.getFirstName());
+				nameVariable = checkManager.nameCheckService(user.getFirstName());
 				//System.out.println(nameVariable);
 				
 				//1.2-Lastname Checking
 				boolean lastNameVariable;
-				lastNameVariable = checking.lastNameCheckService(user.getLastName());
+				lastNameVariable = checkManager.lastNameCheckService(user.getLastName());
 				//System.out.println(lastNameVariable);
 				
 				// 1.3- Password Check Session
 				boolean passwordVariable;
-				passwordVariable = checking.passwordCheckService(user.getPassword());
+				passwordVariable = checkManager.passwordCheckService(user.getPassword());
 				/*System.out.println(variable);*/
 				
 				//1.4- Email format Check Session
 				boolean emailVariable;
-				emailVariable = checking.emailFormatCheckService(user.geteMail());
+				emailVariable = checkManager.emailFormatCheckService(user.geteMail());
 				//System.out.println(emailVariable);
 				
 				//1.5- Ýs email repeated?
 				boolean repeatChecking;
-				repeatChecking = checking.originEmailCheck(user,user.geteMail());
+				repeatChecking = checkManager.originEmailCheck(user,user.geteMail());
 				if(repeatChecking == false) {
 					System.out.println("Email is available");
 					user.setEmailList(user.geteMail());
@@ -42,8 +52,9 @@ public class userManager implements userService {
 				
 				
 				if(nameVariable == true && lastNameVariable==true && passwordVariable==true && emailVariable== true && repeatChecking == false) {
-					System.out.println("Your account has been created");
 					
+					userDao.add(user);
+					verifyService.validationEmail(user);
 				}
 				
 
